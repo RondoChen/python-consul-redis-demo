@@ -7,7 +7,7 @@ from flask import Flask
 
 cf=configparser.ConfigParser()
 try:
-    cf.read('app.ini', encoding='UTF-8')
+    cf.read('config/app.ini', encoding='UTF-8')
 except:
     print('missing configuration file: app.ini')
     exit()
