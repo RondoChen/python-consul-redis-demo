@@ -1,19 +1,18 @@
-import sys
 import time
-import configparser
 import redis
-
+import consul
+import json
 from flask import Flask
 
-cf=configparser.ConfigParser()
 try:
-    cf.read('config/app.ini', encoding='UTF-8')
-except:
-    print('missing configuration file: app.ini')
-    exit()
+    c = consul.Consul(host='127.0.0.1', port=8500, scheme = 'http' )
+    config_json = json.loads(c.kv.get('redis')[1]['Value'].decode('utf-8'))
+
+redis_config = config_json['redis_config']
+show_message = config_json['show_message']
 
 app = Flask(__name__)
-cache = redis.Redis(host=cf.get('redis','redis_host'), port=cf.get('redis','redis_port'), db=cf.get('redis','redis_db'), password=cf.get('redis','redis_password'))
+cache = redis.Redis(host=redis_config['redis_host'], port=redis_config['redis_port'], db=redis_config['redis_db'], password=redis_config['redis_password'])
 
 def get_hit_count():
     retries = 5
@@ -29,7 +28,7 @@ def get_hit_count():
 @app.route('/')
 def hello():
     count = get_hit_count()
-    return 'Hello World! I have been seen {} times.\n'.format(count)
+    return '{}! I have been seen {} times.\n'.format(show_message,count)
 
 if __name__ == "__main__":
     app.run()
