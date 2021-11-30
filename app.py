@@ -17,6 +17,11 @@ show_message = config_json['show_message']
 app = Flask(__name__)
 cache = redis.Redis(host=redis_config['redis_host'], port=redis_config['redis_port'], db=redis_config['redis_db'], password=redis_config['redis_password'])
 
+check_demo = consul.Check.http('http://127.0.0.1:5000/health',interval='2s')
+c.agent.service.register('mydemo', address='127.0.0.1', port=5000,check=check_demo)
+
+
+
 def get_hit_count():
     retries = 5
     while True:
@@ -32,6 +37,10 @@ def get_hit_count():
 def hello():
     count = get_hit_count()
     return '{}! I have been seen {} times.\n'.format(show_message,count)
+
+@app.route('/health')
+def health():
+    return "i am fine"
 
 if __name__ == "__main__":
     app.run()
