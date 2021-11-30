@@ -1,4 +1,3 @@
 flask
 redis
-consul
-json
+python-consul

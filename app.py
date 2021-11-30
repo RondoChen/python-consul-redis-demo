@@ -8,6 +8,9 @@ try:
     c = consul.Consul(host='127.0.0.1', port=8500, scheme = 'http' )
     config_json = json.loads(c.kv.get('redis')[1]['Value'].decode('utf-8'))
 
+except:
+    exit()
+
 redis_config = config_json['redis_config']
 show_message = config_json['show_message']
 
